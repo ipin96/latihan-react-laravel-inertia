@@ -23,7 +23,7 @@ class GuruController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Guru/Add');
     }
 
     /**
@@ -31,7 +31,7 @@ class GuruController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request->all());
     }
 
     /**
