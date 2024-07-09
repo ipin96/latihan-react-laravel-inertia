@@ -1,11 +1,16 @@
+import Breadcrumb from "@/Components/Breadcrumb";
 import Navbar from "@/Components/Navbar";
-import Sidebar from "@/Components/Sidebar";
 
 const AdminLayout = ({ children }) => {
     return (
         <>
-            <Navbar></Navbar>
-            <Sidebar children={children}></Sidebar>
+            <div className="-mb-20">
+                <Navbar></Navbar>
+                <Breadcrumb></Breadcrumb>
+            </div>
+            <div className="flex flex-col mt-[96px] ml-2 lg:mt-20 lg:mx-[262px]">
+                {children}
+            </div>
         </>
     );
 };

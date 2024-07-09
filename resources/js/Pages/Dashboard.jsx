@@ -3,7 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout"
 const Dashboard = () => {
   return (
     <AdminLayout>
-        uhuyyy
+        <h2 className="text-cyan-300">ancok</h2>
     </AdminLayout>
   )
 }
