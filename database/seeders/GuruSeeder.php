@@ -13,14 +13,6 @@ class GuruSeeder extends Seeder
      */
     public function run(): void
     {
-        Guru::create([
-            'nip' => '1234567890123456',
-            'gelar_depan' => 'Dr.',
-            'nama_lengkap' => 'John Doe',
-            'gelar_belakang' => 'Ph.D.',
-            'jk' => 1,
-            'no_hp' => '081234567890',
-            'alamat' => 'Jalan Raya No. 1, Jakarta',
-        ]);
+        Guru::factory(10000)->create();
     }
 }

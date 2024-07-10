@@ -10,4 +10,5 @@ class Guru extends Model
 {
     use HasFactory, HasUlids;
     protected $table = 'guru';
+    protected $guarded = [];
 }
