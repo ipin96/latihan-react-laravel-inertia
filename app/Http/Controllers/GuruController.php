@@ -8,7 +8,6 @@ use App\Data\GuruData;
 use Illuminate\Http\Request;
 use App\Actions\UpsertGuruAction;
 use App\Http\Requests\GuruAddRequest;
-use App\Http\Requests\GuruEditRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class GuruController extends Controller
