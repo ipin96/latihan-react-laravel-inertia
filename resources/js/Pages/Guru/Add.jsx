@@ -3,14 +3,13 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import { Link, router } from "@inertiajs/react";
 import axios from "axios";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
 
 const Add = () => {
-    const [nipMessage, setNipMessage] = useState('')
-    const [namaLengkapMessage, setNamaLengkapMessage] = useState('')
-    const [noHpMessage, setNoHpMessage] = useState('')
-    const [alamatMessage, setAlamatMessage] = useState('')
+    const [nipMessage, setNipMessage] = useState("");
+    const [namaLengkapMessage, setNamaLengkapMessage] = useState("");
+    const [noHpMessage, setNoHpMessage] = useState("");
+    const [alamatMessage, setAlamatMessage] = useState("");
 
     const [values, setValues] = useState({
         nip: "",
@@ -33,57 +32,75 @@ const Add = () => {
 
     function handleSubmit(e) {
         e.preventDefault();
-        axios.post(route('guru.store'), values)
-            .then(response => {
-                const code = response.status
-                const message = response.data.message
+        axios
+            .post(route("guru.store"), values)
+            .then((response) => {
+                const code = response.status;
+                const message = response.data.message;
 
                 if (code === 200 || code === 201) {
                     Swal.fire({
-                        title: 'Berhasil',
+                        title: "Berhasil",
                         text: message,
-                        icon: 'success',
-                        timer: 2000
+                        icon: "success",
+                        timer: 2000,
                     }).then(() => {
-                        router.get(route('guru.index'))
-                    })
+                        router.get(route("guru.index"));
+                    });
                 }
-                handleResetForm()
+                handleResetForm();
             })
-            .catch(error => {
-                setNipMessage('')
-                setNamaLengkapMessage('')
-                setNoHpMessage('')
-                setAlamatMessage('')
+            .catch((error) => {
+                setNipMessage("");
+                setNamaLengkapMessage("");
+                setNoHpMessage("");
+                setAlamatMessage("");
 
-                const code = error.response.status
-                const errors = error.response.data.errors
+                const code = error.response.status;
+                const errors = error.response.data.errors;
+
                 if (code == 422) {
                     Object.keys(errors).forEach((key) => {
-                        if (key == 'nip' && errors['nip'][0] != '') {
-                            setNipMessage(errors['nip'][0])
+                        if (key == "nip" && errors["nip"][0] != "") {
+                            setNipMessage(errors["nip"][0]);
                         }
-                        if (key == 'nama_lengkap' && errors['nama_lengkap'][0] != '') {
-                            setNamaLengkapMessage(errors['nama_lengkap'][0])
+                        if (
+                            key == "nama_lengkap" &&
+                            errors["nama_lengkap"][0] != ""
+                        ) {
+                            setNamaLengkapMessage(errors["nama_lengkap"][0]);
                         }
-                        if (key == 'no_hp' && errors['no_hp'][0] != '') {
-                            setNoHpMessage(errors['no_hp'][0])
+                        if (key == "no_hp" && errors["no_hp"][0] != "") {
+                            setNoHpMessage(errors["no_hp"][0]);
                         }
-                        if (key == 'alamat' && errors['alamat'][0] != '') {
-                            setAlamatMessage(errors['alamat'][0])
+                        if (key == "alamat" && errors["alamat"][0] != "") {
+                            setAlamatMessage(errors["alamat"][0]);
                         }
                     });
+                } else if (code == 500) {
+                    Swal.fire({
+                        title: "Gagal",
+                        text: "Terjadi masalah pada server internal",
+                        icon: "success",
+                        timer: 2000,
+                    });
                 } else {
-                    toast.error(error.response.statusText)
+                    const message = error.data.message;
+                    Swal.fire({
+                        title: "Info",
+                        text: message,
+                        icon: "warning",
+                        timer: 2000,
+                    });
                 }
             });
     }
 
     function handleResetForm() {
-        setNipMessage('')
-        setNamaLengkapMessage('')
-        setNoHpMessage('')
-        setAlamatMessage('')
+        setNipMessage("");
+        setNamaLengkapMessage("");
+        setNoHpMessage("");
+        setAlamatMessage("");
         setValues({
             nip: "",
             gelar_depan: "",
@@ -116,7 +133,12 @@ const Add = () => {
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                             />
                         </div>
-                        <p id="nip" className="my-2 text-sm leading-4 text-red-600">{nipMessage}</p>
+                        <p
+                            id="nip"
+                            className="my-2 text-sm leading-4 text-red-600"
+                        >
+                            {nipMessage}
+                        </p>
                     </div>
                     <div className="grid grid-flow-col">
                         <div className="sm:col-span-2 sm:col-start-1 mr-2">
@@ -136,7 +158,10 @@ const Add = () => {
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
-                            <p id="gelar_depan" className="my-2 text-sm leading-4 text-red-600"></p>
+                            <p
+                                id="gelar_depan"
+                                className="my-2 text-sm leading-4 text-red-600"
+                            ></p>
                         </div>
 
                         <div className="sm:col-span-2 mr-2">
@@ -156,7 +181,12 @@ const Add = () => {
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
-                            <p id="nama_lengkap" className="my-2 text-sm leading-4 text-red-600">{namaLengkapMessage}</p>
+                            <p
+                                id="nama_lengkap"
+                                className="my-2 text-sm leading-4 text-red-600"
+                            >
+                                {namaLengkapMessage}
+                            </p>
                         </div>
 
                         <div className="sm:col-span-2">
@@ -176,7 +206,10 @@ const Add = () => {
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
-                            <p id="gelar_belakang" className="my-2 text-sm leading-4 text-red-600"></p>
+                            <p
+                                id="gelar_belakang"
+                                className="my-2 text-sm leading-4 text-red-600"
+                            ></p>
                         </div>
                     </div>
 
@@ -187,21 +220,38 @@ const Add = () => {
                                 type="radio"
                                 value="1"
                                 checked={values.jk == "1"}
-                                onChange={() => setValues({ ...values, jk: "1" })}
+                                onChange={() =>
+                                    setValues({ ...values, jk: "1" })
+                                }
                                 className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600"
                             />
-                            <label htmlFor="jk" className="block text-sm font-medium leading-6 text-gray-900">Laki - laki</label>
+                            <label
+                                htmlFor="jk"
+                                className="block text-sm font-medium leading-6 text-gray-900"
+                            >
+                                Laki - laki
+                            </label>
                             <input
                                 name="jk"
                                 type="radio"
                                 value="2"
                                 checked={values.jk == "2"}
-                                onChange={() => setValues({ ...values, jk: "2" })}
+                                onChange={() =>
+                                    setValues({ ...values, jk: "2" })
+                                }
                                 className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-600"
                             />
-                            <label htmlFor="jk" className="block text-sm font-medium leading-6 text-gray-900">Perempuan</label>
+                            <label
+                                htmlFor="jk"
+                                className="block text-sm font-medium leading-6 text-gray-900"
+                            >
+                                Perempuan
+                            </label>
                         </div>
-                        <p id="jk" className="my-2 text-sm leading-4 text-red-600"></p>
+                        <p
+                            id="jk"
+                            className="my-2 text-sm leading-4 text-red-600"
+                        ></p>
                     </div>
 
                     <div className="col-span-full">
@@ -220,7 +270,12 @@ const Add = () => {
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                             />
                         </div>
-                        <p id="no_hp" className="my-2 text-sm leading-4 text-red-600">{noHpMessage}</p>
+                        <p
+                            id="no_hp"
+                            className="my-2 text-sm leading-4 text-red-600"
+                        >
+                            {noHpMessage}
+                        </p>
                     </div>
 
                     <div className="col-span-full">
@@ -237,15 +292,21 @@ const Add = () => {
                                 name="alamat"
                                 placeholder="Contoh: Jalan Raya No. 1, Jakarta"
                                 rows="3"
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"></textarea>
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                            ></textarea>
                         </div>
-                        <p id="alamat" className="my-2 text-sm leading-4 text-red-600">{alamatMessage}</p>
+                        <p
+                            id="alamat"
+                            className="my-2 text-sm leading-4 text-red-600"
+                        >
+                            {alamatMessage}
+                        </p>
                     </div>
 
                     <div className="flex items-center justify-end gap-x-2">
                         <Link
                             as="button"
-                            href={route('guru.index')}
+                            href={route("guru.index")}
                             className="rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                         >
                             Kembali

@@ -6,50 +6,80 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const Index = () => {
-    const page = usePage().props
-    const data = usePage().props.gurus.data
-    const [searchTerm, setSearchTerm] = useState('');
+    const page = usePage().props;
+    const data = usePage().props.gurus.data;
+    const [searchTerm, setSearchTerm] = useState("");
     const [filteredData, setFilteredData] = useState(data);
 
     useEffect(() => {
-        const results = data.filter(guru =>
-            guru.nip.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (guru.gelar_depan + ' ' + guru.nama_lengkap + ' ' + guru.gelar_belakang).toLowerCase().includes(searchTerm.toLowerCase())
+        const results = data.filter(
+            (guru) =>
+                guru.nip.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (
+                    guru.gelar_depan +
+                    " " +
+                    guru.nama_lengkap +
+                    " " +
+                    guru.gelar_belakang
+                )
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
         );
         setFilteredData(results);
     }, [searchTerm]);
 
     const handleEdit = (id) => {
-        router.get(route('guru.edit', id));
-    }
+        router.get(route("guru.edit", id));
+    };
 
     const handleDelete = (id) => {
         Swal.fire({
-            title: 'Apakah Anda yakin ingin menghapus data ini?',
-            icon: 'warning',
+            title: "Apakah Anda yakin ingin menghapus data ini?",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonText: 'Iya, Hapus',
-            cancelButtonText: 'Tidak, Batal',
+            confirmButtonText: "Iya, Hapus",
+            cancelButtonText: "Tidak, Batal",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(route('guru.destroy', id)).then((response) => {
-                    Swal.fire({
-                        title: 'Berhasil',
-                        text: response.data.message,
-                        icon: 'success',
-                        timer: 2000
-                    }).then(() => {
-                        router.get(route('guru.index'))
-                    })
-                })
+                axios.delete(route("guru.destroy", id)).then((response) => {
+                    const code = error.response.status;
+                    if (code == 200) {
+                        Swal.fire({
+                            title: "Berhasil",
+                            text: response.data.message,
+                            icon: "success",
+                            timer: 2000,
+                        }).then(() => {
+                            router.get(route("guru.index"));
+                        });
+                    } else if (code == 500) {
+                        Swal.fire({
+                            title: "Gagal",
+                            text: "Terjadi masalah pada server internal",
+                            icon: "success",
+                            timer: 2000,
+                        });
+                    } else {
+                        const message = error.data.message;
+                        Swal.fire({
+                            title: "Info",
+                            text: message,
+                            icon: "warning",
+                            timer: 2000,
+                        });
+                    }
+                });
             }
-        })
-    }
+        });
+    };
 
     return (
         <AdminLayout>
             <TitleBar title="Data Guru">
-                <Link href={route('guru.create')} className="border border-white bg-gray-500 hover:bg-blue-700 text-white hover:text-white focus:ring-4 focus:outline-none px-5 py-2 rounded-lg flex flex-col justify-center items-center">
+                <Link
+                    href={route("guru.create")}
+                    className="border border-white bg-gray-500 hover:bg-blue-700 text-white hover:text-white focus:ring-4 focus:outline-none px-5 py-2 rounded-lg flex flex-col justify-center items-center"
+                >
                     <span className="text-sm">Tambah Data</span>
                 </Link>
             </TitleBar>
@@ -183,11 +213,21 @@ const Index = () => {
                     <div className="mr-2">
                         <p className="text-sm text-gray-700">
                             Menampilkan
-                            <span className="font-medium mx-1">{new Intl.NumberFormat().format(page.gurus.from)}</span>
+                            <span className="font-medium mx-1">
+                                {new Intl.NumberFormat().format(
+                                    page.gurus.from
+                                )}
+                            </span>
                             ke
-                            <span className="font-medium mx-1">{new Intl.NumberFormat().format(page.gurus.to)}</span>
+                            <span className="font-medium mx-1">
+                                {new Intl.NumberFormat().format(page.gurus.to)}
+                            </span>
                             dari
-                            <span className="font-medium mx-1">{new Intl.NumberFormat().format(page.gurus.total)}</span>
+                            <span className="font-medium mx-1">
+                                {new Intl.NumberFormat().format(
+                                    page.gurus.total
+                                )}
+                            </span>
                             hasil
                         </p>
                     </div>
@@ -201,17 +241,21 @@ const Index = () => {
                                     key={i}
                                     href={value.url}
                                     aria-current="page"
-                                    className={`w-auto z-10 inline-flex items-center bg-blue-500 px-2 py-2 text-xs font-semibold rounded-sm text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${i == page.gurus.current_page ? 'bg-blue-700' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: value.label }}
-                                >
-                                </Link>
+                                    className={`w-auto z-10 inline-flex items-center bg-blue-500 px-2 py-2 text-xs font-semibold rounded-sm text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+                                        i == page.gurus.current_page
+                                            ? "bg-blue-700"
+                                            : ""
+                                    }`}
+                                    dangerouslySetInnerHTML={{
+                                        __html: value.label,
+                                    }}
+                                ></Link>
                             ))}
                         </nav>
                     </div>
                 </div>
             </div>
         </AdminLayout>
-
     );
 };
 
