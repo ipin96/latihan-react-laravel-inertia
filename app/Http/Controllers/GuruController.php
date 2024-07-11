@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\UpsertGuruAction;
+use App\Models\Guru;
+use Inertia\Inertia;
 use App\Data\GuruData;
+use Illuminate\Http\Request;
+use App\Actions\UpsertGuruAction;
 use App\Http\Requests\GuruAddRequest;
 use App\Http\Requests\GuruEditRequest;
-use App\Models\Guru;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 class GuruController extends Controller
 {
@@ -40,8 +41,9 @@ class GuruController extends Controller
         try {
             $data = $request->toDTO();
             $action->handle($data);
+            return response()->json(['message' => 'Data guru berhasil disimpan.'], Response::HTTP_CREATED);
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -71,9 +73,9 @@ class GuruController extends Controller
         try {
             $data = $request->toDTO();
             $action->handle($data);
-            return redirect()->route('guru.index');
+            return response()->json(['message' => 'Data guru berhasil diubah.'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -84,9 +86,9 @@ class GuruController extends Controller
     {
         try {
             Guru::find($id)->delete();
-            return redirect()->route('guru.index');
+            return response()->json(['message' => 'Data guru berhasil dihapus.'], Response::HTTP_OK);
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }

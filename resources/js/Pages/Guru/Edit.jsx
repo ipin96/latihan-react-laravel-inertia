@@ -1,13 +1,14 @@
 import TitleBar from "@/Components/TitleBar";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const Edit = () => {
-
-    const error = usePage().props.errors;
-    const [message, setMessage] = useState(false)
+    const [nipMessage, setNipMessage] = useState('')
+    const [namaLengkapMessage, setNamaLengkapMessage] = useState('')
+    const [noHpMessage, setNoHpMessage] = useState('')
+    const [alamatMessage, setAlamatMessage] = useState('')
 
     const guru = usePage().props.guru;
 
@@ -23,7 +24,7 @@ const Edit = () => {
     });
 
     const handleChange = (e) => {
-        const key = e.target.id;
+        const key = e.target.name;
         const value = e.target.value;
         setValues((values) => ({
             ...values,
@@ -33,22 +34,63 @@ const Edit = () => {
 
     function handleSubmit(e) {
         e.preventDefault();
-        setMessage(true);
         axios.put(route('guru.update', { guru: guru.id }), values)
             .then(response => {
-                toast.success('Berhasil memperbarui data guru.');
+                const code = response.status
+                const message = response.data.message
+
+                if (code == 200 || code == 201) {
+                    Swal.fire({
+                        title: 'Berhasil',
+                        text: message,
+                        icon: 'success',
+                        timer: 2000
+                    }).then(() => {
+                        router.get(route('guru.index'))
+                    })
+                }
+                handleResetForm()
             })
             .catch(error => {
+                setNipMessage('')
+                setNamaLengkapMessage('')
+                setNoHpMessage('')
+                setAlamatMessage('')
+
                 const code = error.response.status
+                const errors = error.response.data.errors
                 if (code == 422) {
-                    toast.error(error.response.statusText)
+                    Object.keys(errors).forEach((key) => {
+                        if (key == 'nip' && errors['nip'][0] != '') {
+                            setNipMessage(errors['nip'][0])
+                        }
+                        if (key == 'nama_lengkap' && errors['nama_lengkap'][0] != '') {
+                            setNamaLengkapMessage(errors['nama_lengkap'][0])
+                        }
+                        if (key == 'no_hp' && errors['no_hp'][0] != '') {
+                            setNoHpMessage(errors['no_hp'][0])
+                        }
+                        if (key == 'alamat' && errors['alamat'][0] != '') {
+                            setAlamatMessage(errors['alamat'][0])
+                        }
+                    });
                 } else {
-                    toast.error(error.response.statusText)
+                    Swal.fire({
+                        title: 'Gagal',
+                        text: error.response.data.message,
+                        icon: 'error',
+                        timer: 2000
+                    })
                 }
             });
     }
 
     function handleResetForm() {
+        setNipMessage('')
+        setNamaLengkapMessage('')
+        setNoHpMessage('')
+        setAlamatMessage('')
+
         setValues({
             id: guru.id ?? "",
             nip: "",
@@ -77,15 +119,12 @@ const Edit = () => {
                             <input
                                 value={values.nip}
                                 onChange={handleChange}
-                                id="nip"
                                 name="nip"
                                 placeholder="Contoh: 3327120102930001"
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                             />
                         </div>
-                        <p className="my-2 text-sm leading-4 text-red-600">
-                            {error.nip}
-                        </p>
+                        <p id="nip" className="my-2 text-sm leading-4 text-red-600">{nipMessage}</p>
                     </div>
                     <div className="grid grid-flow-col">
                         <div className="sm:col-span-2 sm:col-start-1 mr-2">
@@ -101,14 +140,11 @@ const Edit = () => {
                                     onChange={handleChange}
                                     type="text"
                                     name="gelar_depan"
-                                    id="gelar_depan"
                                     placeholder="Contoh: Dr."
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
-                            <p className="my-2 text-sm leading-4 text-red-600">
-                                {error.gelar_depan}
-                            </p>
+                            <p id="gelar_depan" className="my-2 text-sm leading-4 text-red-600"></p>
                         </div>
 
                         <div className="sm:col-span-2 mr-2">
@@ -124,14 +160,11 @@ const Edit = () => {
                                     onChange={handleChange}
                                     type="text"
                                     name="nama_lengkap"
-                                    id="nama_lengkap"
                                     placeholder="Contoh: John Doe"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
-                            <p className="my-2 text-sm leading-4 text-red-600">
-                                {error.nama_lengkap}
-                            </p>
+                            <p id="nama_lengkap" className="my-2 text-sm leading-4 text-red-600">{namaLengkapMessage}</p>
                         </div>
 
                         <div className="sm:col-span-2">
@@ -147,21 +180,17 @@ const Edit = () => {
                                     onChange={handleChange}
                                     type="text"
                                     name="gelar_belakang"
-                                    id="gelar_belakang"
                                     placeholder="Contoh: S.Kom, M.Kom"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
-                            <p className="my-2 text-sm leading-4 text-red-600">
-                                {error.gelar_belakang}
-                            </p>
+                            <p id="gelar_belakang" className="my-2 text-sm leading-4 text-red-600"></p>
                         </div>
                     </div>
 
                     <div className="col-span-full">
                         <div className="flex items-center gap-x-3">
                             <input
-                                id="jk"
                                 name="jk"
                                 type="radio"
                                 value="1"
@@ -171,7 +200,6 @@ const Edit = () => {
                             />
                             <label htmlFor="jk" className="block text-sm font-medium leading-6 text-gray-900">Laki - laki</label>
                             <input
-                                id="jk"
                                 name="jk"
                                 type="radio"
                                 value="2"
@@ -181,9 +209,7 @@ const Edit = () => {
                             />
                             <label htmlFor="jk" className="block text-sm font-medium leading-6 text-gray-900">Perempuan</label>
                         </div>
-                        <p className="my-2 text-sm leading-4 text-red-600">
-                            {error.jk}
-                        </p>
+                        <p id="jk" className="my-2 text-sm leading-4 text-red-600"></p>
                     </div>
 
                     <div className="col-span-full">
@@ -197,15 +223,12 @@ const Edit = () => {
                             <input
                                 value={values.no_hp}
                                 onChange={handleChange}
-                                id="no_hp"
                                 name="no_hp"
                                 placeholder="Contoh: +62 819-4554-3251"
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                             />
                         </div>
-                        <p className="my-2 text-sm leading-4 text-red-600">
-                            {error.no_hp}
-                        </p>
+                        <p id="no_hp" className="my-2 text-sm leading-4 text-red-600">{noHpMessage}</p>
                     </div>
 
                     <div className="col-span-full">
@@ -219,25 +242,22 @@ const Edit = () => {
                             <textarea
                                 value={values.alamat}
                                 onChange={handleChange}
-                                id="alamat"
                                 name="alamat"
                                 placeholder="Contoh: Jalan Raya No. 1, Jakarta"
                                 rows="3"
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"></textarea>
                         </div>
-                        <p className="my-2 text-sm leading-4 text-red-600">
-                            {error.alamat}
-                        </p>
+                        <p id="alamat" className="my-2 text-sm leading-4 text-red-600">{alamatMessage}</p>
                     </div>
 
                     <div className="flex items-center justify-end gap-x-2">
-                        <button
-                            onClick={handleResetForm}
-                            type="button"
+                        <Link
+                            as="button"
+                            href={route('guru.index')}
                             className="rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                         >
-                            Batal
-                        </button>
+                            Kembali
+                        </Link>
                         <button
                             type="submit"
                             className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
@@ -247,10 +267,6 @@ const Edit = () => {
                     </div>
                 </form>
             </div>
-
-            {message === true && (
-                <ToastContainer />
-            )}
         </AdminLayout>
     );
 };

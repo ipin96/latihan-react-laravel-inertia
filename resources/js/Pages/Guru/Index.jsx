@@ -2,30 +2,37 @@ import TitleBar from "@/Components/TitleBar";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Button } from "@headlessui/react";
 import { Link, router, usePage } from "@inertiajs/react";
-import { useState } from "react";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Swal from "sweetalert2";
 
 const Index = () => {
     const page = usePage().props
     const data = usePage().props.gurus.data
-    const [message, setMessage] = useState(false)
 
     const handleEdit = (id) => {
         router.get(route('guru.edit', id));
     }
 
     const handleDelete = (id) => {
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-            try {
-                setMessage(true)
-                toast.dismiss();
-                router.delete(route('guru.destroy', id))
-                toast.success('Data guru berhasil dihapus.');
-            } catch (error) {
-                toast.error('Gagal menghapus data guru.');
+        Swal.fire({
+            title: 'Apakah Anda yakin ingin menghapus data ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, Hapus',
+            cancelButtonText: 'Tidak, Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(route('guru.destroy', id)).then((response) => {
+                    Swal.fire({
+                        title: 'Berhasil',
+                        text: response.data.message,
+                        icon: 'success',
+                        timer: 2000
+                    }).then(() => {
+                        router.get(route('guru.index'))
+                    })
+                })
             }
-        }
+        })
     }
 
 
@@ -206,11 +213,6 @@ const Index = () => {
                     </div>
                 </div>
             </div>
-
-            {message === true  && (
-                <ToastContainer />
-            )}
-
         </AdminLayout>
 
     );
