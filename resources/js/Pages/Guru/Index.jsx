@@ -2,11 +2,22 @@ import TitleBar from "@/Components/TitleBar";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Button } from "@headlessui/react";
 import { Link, router, usePage } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const Index = () => {
     const page = usePage().props
     const data = usePage().props.gurus.data
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredData, setFilteredData] = useState(data);
+
+    useEffect(() => {
+        const results = data.filter(guru =>
+            guru.nip.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (guru.gelar_depan + ' ' + guru.nama_lengkap + ' ' + guru.gelar_belakang).toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredData(results);
+    }, [searchTerm]);
 
     const handleEdit = (id) => {
         router.get(route('guru.edit', id));
@@ -34,7 +45,6 @@ const Index = () => {
             }
         })
     }
-
 
     return (
         <AdminLayout>
@@ -66,6 +76,7 @@ const Index = () => {
                     <input
                         type="text"
                         id="table-search"
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-yellow-500 dark:focus:border-yellow-500"
                         placeholder="Search for items"
                     />
@@ -95,7 +106,7 @@ const Index = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((item) => (
+                    {filteredData.map((item) => (
                         <tr
                             key={item.id}
                             className="bg-white border-b dark:bg-gray-800 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -167,31 +178,17 @@ const Index = () => {
             </table>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 w-[675px] md:w-[725px] lg:w-[985px] xl:w-[1040px] mx-7 lg:mx-7">
-                <div className="flex flex-1 justify-between sm:hidden">
-                    <a
-                        href="#"
-                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                        Previous
-                    </a>
-                    <a
-                        href="#"
-                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                        Next
-                    </a>
-                </div>
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
+            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-4 w-[675px] md:w-[725px] lg:w-[985px] xl:w-[1040px] mx-7">
+                <div className="sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div className="mr-2">
                         <p className="text-sm text-gray-700">
-                            Showing
-                            <span className="font-medium mx-1">{page.gurus.from}</span>
-                            to
-                            <span className="font-medium mx-1">{page.gurus.to}</span>
-                            of
-                            <span className="font-medium mx-1">{page.gurus.total}</span>
-                            results
+                            Menampilkan
+                            <span className="font-medium mx-1">{new Intl.NumberFormat().format(page.gurus.from)}</span>
+                            ke
+                            <span className="font-medium mx-1">{new Intl.NumberFormat().format(page.gurus.to)}</span>
+                            dari
+                            <span className="font-medium mx-1">{new Intl.NumberFormat().format(page.gurus.total)}</span>
+                            hasil
                         </p>
                     </div>
                     <div>
@@ -204,7 +201,7 @@ const Index = () => {
                                     key={i}
                                     href={value.url}
                                     aria-current="page"
-                                    className={`relative z-10 inline-flex items-center bg-blue-500 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${i == page.gurus.current_page ? 'bg-blue-700' : ''}`}
+                                    className={`w-auto z-10 inline-flex items-center bg-blue-500 px-2 py-2 text-xs font-semibold rounded-sm text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${i == page.gurus.current_page ? 'bg-blue-700' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: value.label }}
                                 >
                                 </Link>

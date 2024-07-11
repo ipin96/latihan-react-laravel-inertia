@@ -17,7 +17,7 @@ class GuruFactory extends Factory
     public function definition(): array
     {
         return [
-            'nip' => fake()->unique()->numberBetween(1, 20000),
+            'nip' => fake()->unique()->numberBetween(1, 200000),
             'gelar_depan' => fake()->title(),
             'nama_lengkap' => fake()->name(),
             'gelar_depan' => fake()->title(),
